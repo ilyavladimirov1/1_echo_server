@@ -1,20 +1,24 @@
 import socket
+import logging
+
+# Настройка логгера
+logging.basicConfig(filename='server.log', level=logging.INFO)
+logger = logging.getLogger('server')
 
 sock = socket.socket()
 sock.bind(('', 9090))
-print("Server starting!")
+logger.info("Server starting!")
 sock.listen(0)
-print("Port is listening")
+logger.info("Port is listening")
 conn, addr = sock.accept()
-print("Client accepted")
-print("Client address:", addr[0])
-print("Client port:", addr[1])
+logger.info(f"Client accepted from {addr[0]}:{addr[1]}")
 
 
 while True:
 	data = conn.recv(1024)
-    	if data.decode().strip() == 'exit':
+    	if not data:
         	break
+	logger.info(f"Received message: {data.decode()}")
     	conn.send(data.upper())
 
 conn.close()
