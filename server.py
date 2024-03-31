@@ -1,24 +1,28 @@
 import socket
-import logging
 
-# Настройка логгера
-logging.basicConfig(filename='server.log', level=logging.INFO)
-logger = logging.getLogger('server')
+def find_free_port(start_port):
+    port = start_port
+    while True:
+        try:
+            sock = socket.socket()
+            sock.bind(('', port))
+            print(f"Server is listening on port {port}")
+            return sock, port
+        except OSError:
+            print(f"Port {port} is already in use, trying the next one...")
+            port += 1
 
-sock = socket.socket()
-sock.bind(('', 9090))
-logger.info("Server starting!")
+sock, port = find_free_port(9090)
 sock.listen(0)
-logger.info("Port is listening")
 conn, addr = sock.accept()
-logger.info(f"Client accepted from {addr[0]}:{addr[1]}")
-
+print("Client accepted")
+print("Client address:", addr[0])
+print("Client port:", addr[1])
 
 while True:
 	data = conn.recv(1024)
     	if not data:
         	break
-	logger.info(f"Received message: {data.decode()}")
     	conn.send(data.upper())
 
 conn.close()
